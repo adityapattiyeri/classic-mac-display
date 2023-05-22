@@ -4,7 +4,12 @@ Esphome powered eink display in a 3d printed classic mac case!
 ## Functionality
 The code currently displays the progress of the 3d printer using data form octoprint. Any data can be displayed by altering the code.
 
+# Getting started
+Place the images folder inside the esphome folder. Dowload the appropriate fonts and place it in the fonts folder.
+
 ## Pictures
+![DSC_0008](https://github.com/adityapattiyeri/classic-mac-display/assets/61015809/8c7e6e19-8437-47d6-b39c-119baecf9955)
+![DSC_0006](https://github.com/adityapattiyeri/classic-mac-display/assets/61015809/25b12532-d2aa-4e47-9d19-5892f3579e30)
 
 ## Component list
 1. Any variant of ESP32/8266 boards should work just fine, but the case has been designed around the ESP32 Feather Board.
@@ -13,8 +18,8 @@ The code currently displays the progress of the 3d printer using data form octop
    https://www.waveshare.com/1.54inch-e-paper-module.htm
 
 ## Wiring & Assembly
-The Wiring can be done either by using the included jumper cables or can directly be soldered onto the board. I choose the second option to make the case even more compact.
-Be careful while assembilng the components as the supports are quite faragile. I broke mine while installing and just used hot glue instead. The display is a snug fit because of the connector on top.
+The wiring can be done either by using the included jumper cables or can directly be soldered onto the board. I choose the second option to make the case even more compact.
+Be careful while assembilng the components as the supports are quite faragile. I broke mine while installing and just used hot glue instead.
 
 ## Support
 
