@@ -1,0 +1,131 @@
+esphome:
+  name: classic-imac-display
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+logger:
+api:
+ota:
+
+
+spi:
+  clk_pin: 5
+  mosi_pin: 18
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FONTS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#   
+font:
+
+#percentage font
+  - file: 'fonts/Tahoma Regular font.ttf'
+    id: percentage_font
+    size: 60
+    glyphs: ['!', '"', '%', '(' ,')', '+', '=', ',', '-', '_', '.' ,':' ,'°' , '0','1','2','3','4','5', 
+             '6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S', 
+             'T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+             'q','r','s','t','u','v','w','x','y','z','@','&','?','<','>',' ']
+            
+#regular font         
+  - file: 'fonts/Tahoma Regular font.ttf'
+    id: regular_font
+    size: 28
+    glyphs: ['!', '"', '%', '(' ,')', '+', '=', ',', '-', '_', '.' ,':' ,'°' , '0','1','2','3','4','5', 
+             '6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S', 
+             'T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+             'q','r','s','t','u','v','w','x','y','z','@','&','?','<','>',' ']
+
+image:
+  - file: "images/3dprinter.png"
+    id: printer
+    resize: 60x60
+    type: TRANSPARENT_IMAGE
+
+  - file: "images/apple_logo.png"
+    id: apple_logo
+    resize: 100x100
+    type: TRANSPARENT_IMAGE
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SENSORS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#    
+sensor:
+
+  - platform: homeassistant
+    id: printer_percentage
+    accuracy_decimals: 0
+    entity_id: sensor.octoprint_job_percentage
+    internal: true
+ 
+  - platform: homeassistant
+    id: printer_bed_temp
+    accuracy_decimals: 0
+    entity_id: sensor.octoprint_actual_bed_temp
+    internal: true
+
+
+  - platform: homeassistant
+    id: printer_head_temp
+    accuracy_decimals: 0
+    entity_id: sensor.octoprint_actual_tool0_temp
+    internal: true
+
+  - platform: wifi_signal
+    name: "Home Remote WiFi Signal"
+    id: signal_strength
+    update_interval: 30s
+
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TEXT SENSORS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#       
+text_sensor:
+
+  - platform: homeassistant
+    id: printer_state
+    entity_id: sensor.octoprint_current_state
+    internal: true   
+
+
+display:
+  - platform: waveshare_epaper
+    cs_pin: 19
+    dc_pin: 22
+    busy_pin: 14
+    reset_pin: 23
+    model: 1.54inv2
+    full_update_every: 1
+    id: eink_display
+    update_interval: 30s
+    lambda: |-
+      //display apple logo when octoprint is unavailable
+      if(id(printer_percentage).state>=0 && id(printer_percentage).state<=100) 
+      { //logo
+        it.image(5, 5, id(printer));
+        
+        //To eleminate "%" symbol when its reaches 100%
+        if(id(printer_percentage).state==100)
+        {it.printf(135, 35, id(percentage_font),  TextAlign::CENTER, "100");}
+        else
+        {it.printf(135, 35, id(percentage_font) ,TextAlign::CENTER, "%.0f%%",id(printer_percentage).state);}
+        
+        //draws the progress bar
+        it.rectangle(5, 75, 190, 11);
+        it.filled_rectangle(7, 77, (id(printer_percentage).state*1.87), 7);
+        
+        //extra info
+        it.printf(100,110, id(regular_font) ,TextAlign::CENTER,"%s", to_string(id(printer_state).state).c_str());
+        it.printf(5,130, id(regular_font) ,TextAlign::LEFT, "Bed      : %.0f°C",id(printer_bed_temp).state);
+        it.printf(5,160, id(regular_font) ,TextAlign::LEFT, "Hotend : %.0f°C",id(printer_head_temp).state);
+      }
+
+      else
+      {
+        //diplay apple logo
+        it.image(50, 50, id(apple_logo));
+      }
+
+
